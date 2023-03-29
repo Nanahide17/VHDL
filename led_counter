@@ -1,0 +1,88 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_arith.ALL;
+use IEEE.std_logic_unsigned.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity led_counter is
+    Port ( 
+       CLK : in STD_LOGIC;
+       RST : in STD_LOGIC;
+       btn_left : in STD_LOGIC;
+       btn_right : in STD_LOGIC;
+       leds_out : out STD_LOGIC_VECTOR (15 downto 0));
+end led_counter;
+
+architecture Behavioral of led_counter is
+    signal clock_div : std_logic_vector(23 downto 0);
+    signal compteur : std_logic_vector(4 downto 0);
+begin
+    -- Clock Divider
+    process (CLK,RST)
+    begin
+        if (CLK'event and CLK = '1' and RST = '0') then
+            clock_div <= clock_div + '1';
+    end if;
+    end process;
+
+  process (CLK, RST, btn_left, btn_right)
+  begin
+    if (RST = '1') then  -- Réinitialisation
+      compteur <= (others => '0');
+    elsif (clock_div(23)'event and clock_div(23) = '1') then  -- Sur front montant de l'horloge
+      if (btn_left = '1') then  -- Incrémentation
+        compteur <= compteur + 1;
+      elsif (btn_right = '1' and compteur > "0000000000000000") then  -- Décrémentation
+        compteur <= compteur - 1;
+      end if;
+    end if;
+  end process;
+
+    
+  -- Sortie vers les LED
+  process(compteur)
+  begin
+    if (compteur = "0000") then
+        leds_out<="0000000000000001";
+    elsif (compteur = "0001") then
+        leds_out<="0000000000000011";
+    elsif (compteur = "0010") then
+        leds_out<="0000000000000111";
+    elsif (compteur = "0011") then
+        leds_out<="0000000000001111";
+    elsif (compteur = "0100") then
+        leds_out<="0000000000011111";
+    elsif (compteur = "0101") then
+        leds_out<="0000000000111111";
+    elsif (compteur = "0110") then
+        leds_out<="0000000001111111";
+    elsif (compteur = "0111") then
+        leds_out<="0000000011111111";
+    elsif (compteur = "1000") then
+        leds_out<="0000000111111111";
+    elsif (compteur = "1001") then
+        leds_out<="0000001111111111";
+    elsif (compteur = "1010") then
+        leds_out<="0000011111111111";
+    elsif (compteur = "1011") then
+        leds_out<="0000111111111111";
+    elsif (compteur = "1100") then
+        leds_out<="0001111111111111";
+    elsif (compteur = "1101") then
+        leds_out<="0011111111111111";
+    elsif (compteur = "1110") then
+        leds_out<="0111111111111111";
+    elsif (compteur = "1111") then
+        leds_out<="1111111111111111";
+    end if;
+  end process;
+
+end Behavioral;
