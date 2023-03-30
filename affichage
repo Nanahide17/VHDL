@@ -1,0 +1,37 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity sujet4 is
+    Port ( CLK : in std_logic;
+           RST : in std_logic;
+           seg : out std_logic_vector(6 downto 0);
+           an : out std_logic_vector(3 downto 0));
+end sujet4;
+
+architecture Behavioral of sujet4 is
+
+signal compteur : integer range 0 to 25000000 := 0;
+
+begin
+
+process (CLK, RST)
+begin
+    if RST = '1' then
+        compteur <= 0;
+        seg <= (others => '0');
+        an <= "1111";
+        
+    elsif rising_edge(CLK) then
+        compteur <= compteur + 1;
+        
+        if compteur = 25000000 then
+            seg <= "0011001"; -- affiche le chiffre 4
+            an <= "0000"; -- allume tous les afficheurs
+            compteur <= 0;
+        end if;
+    end if;
+end process;
+
+end Behavioral;
