@@ -3,35 +3,33 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-entity sujet4 is
-    Port ( CLK : in std_logic;
-           RST : in std_logic;
-           seg : out std_logic_vector(6 downto 0);
-           an : out std_logic_vector(3 downto 0));
-end sujet4;
+entity affichage is
+    Port ( 
+        CLK : in STD_LOGIC;
+        RST : in std_logic;
+        seg : out std_logic_vector(6 downto 0);
+        an : out std_logic_vector(3 downto 0)
+    );
+end affichage;
 
-architecture Behavioral of sujet4 is
-
-signal compteur : integer range 0 to 25000000 := 0;
-
+architecture Behavioral of affichage is
+    signal clock_div : STD_LOGIC_VECTOR (23 downto 0);
 begin
-
-process (CLK, RST)
-begin
-    if RST = '1' then
-        compteur <= 0;
-        seg <= (others => '0');
-        an <= "1111";
-        
-    elsif rising_edge(CLK) then
-        compteur <= compteur + 1;
-        
-        if compteur = 25000000 then
-            seg <= "0011001"; -- affiche le chiffre 4
-            an <= "0000"; -- allume tous les afficheurs
-            compteur <= 0;
+    process (CLK,RST)
+    begin
+        if (RST = '1') then
+            clock_div <= (others => '0');
+            seg <= (others =>'0');
+            an <= "1111";
+        elsif (CLK'event and CLK = '1' and RST = '0') then
+            clock_div <= clock_div + '1';
+            if (clock_div = "111111111111111111111111") then
+                seg <= "1111001";
+                an <="0000";
+                clock_div <= (others => '0');
+            end if;
         end if;
-    end if;
-end process;
+    end process;
+
 
 end Behavioral;
