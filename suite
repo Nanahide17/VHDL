@@ -1,0 +1,54 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity suite is
+    Port ( CLK : in STD_LOGIC;
+           RST : in STD_LOGIC;
+           an : out std_logic_vector(3 downto 0);
+           seg : out std_logic_vector(6 downto 0)
+           );
+end suite;
+
+architecture Behavioral of suite is
+    signal clock_div : std_logic_vector(15 downto 0);
+    signal chiffre_sel : std_logic_vector(3 downto 0) := "1110";
+begin
+    process(CLK,RST)
+    begin
+        if(RST = '1') then
+            clock_div <= (others => '0');
+        elsif (CLK'event and CLK = '1' and RST = '0') then
+            clock_div <= clock_div + '1';
+            if (clock_div = "1111111111111111") then
+                clock_div <= (others => '0');
+                if chiffre_sel = "1110" then
+                    chiffre_sel <= "1101";
+                    seg <= "1111001";
+                elsif chiffre_sel = "1101" then
+                    chiffre_sel <= "1011";
+                    seg <= "0100100";
+                elsif chiffre_sel = "1011" then
+                    chiffre_sel <= "0111";
+                    seg <= "0110000";
+                else
+                    chiffre_sel <= "1110";
+                    seg <= "0011001";
+                end if;
+            end if;
+        end if;
+    end process;
+
+    an <= chiffre_sel;
+
+end Behavioral;
