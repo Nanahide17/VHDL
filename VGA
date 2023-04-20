@@ -1,0 +1,38 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity VGA is
+    Port ( clk : in STD_LOGIC;
+           reset : in STD_LOGIC;
+           
+           HS : out std_logic;
+           VS : out std_logic;
+           
+           RED : out std_logic_vector(3 downto 0);
+           GREEN : out std_logic_vector(3 downto 0);
+           BLUE : out std_logic_vector(3 downto 0));
+end VGA;
+
+architecture structurale of VGA is
+    
+component div_25MHz
+    port(CLK,RST : in std_logic; O : out std_logic);
+end component;
+
+component vga_controller_640_60
+    port(rst,pixel_clk : in std_logic; HS,VS,blank : out std_logic; hcount,vcount : out std_logic_vector(10 downto 0));
+end component;
+
+component image
+    port(RST,blank : in std_logic; hcount,vcount : in std_logic_vector(10 downto 0); red,green,blue : out std_logic_vector(3 downto 0));
+end component;
+
+signal  pixel_clk, blank : std_logic;
+signal  hcount, vcount : std_logic_vector(10 downto 0);
+
+begin
+U1 : image port map(RST=>reset, blank=>blank, hcount=>hcount, vcount=>vcount, red=>RED, green=>GREEN, blue=>BLUE);
+U2 : vga_controller_640_60 port map(rst=>reset, pixel_clk=>pixel_clk, HS=>HS, VS=>VS, hcount=>hcount, vcount=>vcount, blank=>blank);
+U3 : div_25MHz port map(CLK=>clk, RST=>reset, O=>pixel_clk);
+
+end structurale;
