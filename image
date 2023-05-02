@@ -24,9 +24,23 @@ begin
             green <= (others => '0');
             blue <= (others => '0');
         elsif (blank = '0') then
-            red <= "1111";
-            green <= "1111";
-            blue <= "1111";
+            if ((hcount >= "00110101011") and (hcount < "01010000000")) then
+                red <= (others => '1');
+                green <= (others => '0');
+                blue <= (others => '0');
+            elsif ((hcount >= "00011010110") and (hcount < "00110101011")) then
+                red <= (others => '1');
+                green <= (others => '1');
+                blue <= (others => '1');
+            elsif ((hcount >= "00000000000") and (hcount < "00011010110")) then
+                red <= (others => '0');
+                green <= (others => '0');
+                blue <= (others => '1');
+            else
+                red <= (others => '0');
+                green <= (others => '0');
+                blue <= (others => '0');
+            end if;
         else
             red <= (others => '0');
             green <= (others => '0');
@@ -34,3 +48,4 @@ begin
         end if;
     end process;
 end Behavioral;
+
