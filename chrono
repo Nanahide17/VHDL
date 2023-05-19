@@ -1,0 +1,166 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity chrono is
+    Port ( CLK : in STD_LOGIC;
+           RST : in STD_LOGIC;
+           an : out std_logic_vector(3 downto 0);
+           seg : out std_logic_vector(6 downto 0)
+           );
+end chrono;
+
+architecture Behavioral of chrono is
+    signal clock_div : std_logic_vector(15 downto 0);
+    signal chiffre_sel : std_logic_vector(3 downto 0) := "1110";
+    signal unite : std_logic_vector(4 downto 0);
+    signal dixaine : std_logic_vector(4 downto 0);
+    signal centaine : std_logic_vector(4 downto 0);
+    signal millieme : std_logic_vector(4 downto 0);
+    signal unite_valide : std_logic;
+    signal dixaine_valide : std_logic;
+    signal centaine_valide : std_logic;
+    signal millieme_valide : std_logic;
+begin
+    process(CLK,RST)
+    begin
+        if(RST = '1') then
+            clock_div <= (others => '0');
+        elsif (CLK'event and CLK = '1' and RST = '0') then
+            clock_div <= clock_div + '1';
+            if (clock_div = "1111111111111111") then
+                clock_div <= (others => '0');
+                if chiffre_sel = "1110" then
+                    chiffre_sel <= "1101";
+                    case unite is
+                        when "0000" => seg<="1000000";
+                        when "0001" => seg<="1111001";
+                        when "0010" => seg<="0100100";
+                        when "0011" => seg<="0110000";
+                        when "0100" => seg<="0011001";
+                        when "0101" => seg<="0010010";
+                        when "0110" => seg<="0000010";
+                        when "0111" => seg<="1111000";
+                        when "1000" => seg<="0000000";
+                        when "1001" => seg<="0010000";
+                        when others => seg<="0001110";
+                    end case;
+                elsif chiffre_sel = "1101" then
+                    chiffre_sel <= "1011";
+                    case dixaine is
+                        when "0000" => seg<="1000000";
+                        when "0001" => seg<="1111001";
+                        when "0010" => seg<="0100100";
+                        when "0011" => seg<="0110000";
+                        when "0100" => seg<="0011001";
+                        when "0101" => seg<="0010010";
+                        when "0110" => seg<="0000010";
+                        when "0111" => seg<="1111000";
+                        when "1000" => seg<="0000000";
+                        when "1001" => seg<="0010000";
+                        when others => seg<="0001110";
+                    end case;
+                elsif chiffre_sel = "1011" then
+                    chiffre_sel <= "0111";
+                    case centaine is
+                        when "0000" => seg<="1000000";
+                        when "0001" => seg<="1111001";
+                        when "0010" => seg<="0100100";
+                        when "0011" => seg<="0110000";
+                        when "0100" => seg<="0011001";
+                        when "0101" => seg<="0010010";
+                        when "0110" => seg<="0000010";
+                        when "0111" => seg<="1111000";
+                        when "1000" => seg<="0000000";
+                        when "1001" => seg<="0010000";
+                        when others => seg<="0001110";
+                    end case;
+                else
+                    chiffre_sel <= "1110";
+                    case millieme is
+                        when "0000" => seg<="1000000";
+                        when "0001" => seg<="1111001";
+                        when "0010" => seg<="0100100";
+                        when "0011" => seg<="0110000";
+                        when "0100" => seg<="0011001";
+                        when "0101" => seg<="0010010";
+                        when "0110" => seg<="0000010";
+                        when "0111" => seg<="1111000";
+                        when "1000" => seg<="0000000";
+                        when "1001" => seg<="0010000";
+                        when others => seg<="0001110";
+                    end case;
+                end if;
+            end if;
+        end if;
+    end process;
+
+--Gére les secondes
+    process(CLK, RST)
+    begin
+        if(RST='1') then
+            unite <= (others => '0');
+        elsif(rising_edge(CLK)) then
+            if(unite>="1001") then
+                unite <= (others => '0');
+            else
+                unite <= unite + 1;
+            end if;
+        end if;
+    end process;
+    unite_valide <= '1' when unite="1001" else '0';
+
+--Gére les dixaines de saconde
+    process(CLK, RST)
+    begin
+        if(RST='1') then
+            dixaine <= (others => '0');
+        elsif(rising_edge(CLK)) then
+             if(unite_valide='1') then
+                dixaine<= dixaine+1;
+             end if;
+        end if;
+    end process;
+    dixaine_valide <= '1' when dixaine="1001" else '0';
+
+--Gére les centaines de secondes
+    process(CLK, RST)
+    begin
+        if(RST='1') then
+            centaine <= (others => '0');
+        elsif(rising_edge(CLK)) then
+             if(dixaine_valide='1') then
+                centaine<= centaine+1;
+             end if;
+        end if;
+    end process;
+    centaine_valide <= '1' when centaine="1001" else '0';     
+    
+--Gére les milles secondes
+    process(CLK, RST)
+    begin
+        if(RST='1') then
+            millieme <= (others => '0');
+        elsif(rising_edge(CLK)) then
+             if(centaine_valide='1') then
+                millieme<= millieme+1;
+             end if;
+        end if;
+    end process;
+    millieme_valide <= '1' when millieme="1001" else '0';  
+    
+ 
+    an <= chiffre_sel;
+
+
+end Behavioral;
